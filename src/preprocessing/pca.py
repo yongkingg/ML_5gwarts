@@ -6,18 +6,18 @@ from sklearn.decomposition import PCA
 # ==========================
 # 1. 파일 경로 설정
 # ==========================
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 FEATURE_DIR = os.path.join(BASE_DIR, "data", "features")
-OUTPUT_DIR = os.path.join(BASE_DIR, "data", "processed")
+OUTPUT_DIR = os.path.join(BASE_DIR, "data", "features")
 
-os.makedirs(OUTPUT_DIR, exist_ok=False)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 FILES = {
     "gist":        ("features_gist.csv",       128),
     "sift":        ("features_sift_avg.csv",    64),
-    "hog":         ("features_hog.csv",        256),
+    "hog":         ("features_hog.csv",        128),
     "hsv":         ("features_hsv.csv",         64),
-    "orb":         ("features_orb_avg.csv",     32),  # 그대로 쓰거나 16도 가능
+    "orb":         ("features_orb_avg.csv",     32),  
 }
 
 # ==========================
@@ -28,6 +28,8 @@ def run_pca(feature_name, filename, out_dim):
     print(f"\n[Loading] {path}")
 
     df = pd.read_csv(path)
+    if "label" in df.columns:
+        df = df.drop(columns=["label"])
     X = df.values
 
     print(f" - original shape : {X.shape}")
