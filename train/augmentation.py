@@ -36,12 +36,12 @@ def augment_images():
             all_files = os.listdir(item_path)
             original_image_files = [
                 f for f in all_files 
-                if f.lower().endswith(".jpg") and not f.startswith('aug_')
+                if f.lower().endswith(".png") and not f.startswith('aug_')
             ]
             
             existing_aug_files = [
                 f for f in all_files 
-                if f.lower().endswith(".jpg") and f.startswith('aug_')
+                if f.lower().endswith(".png") and f.startswith('aug_')
             ]
 
             num_originals = len(original_image_files)
@@ -81,9 +81,9 @@ def augment_images():
                         
                         augmented_img = chosen_transform(img_rgb)
                         
-                        new_filename = f"aug_{file_index:03d}.jpg"
+                        new_filename = f"aug_{file_index:03d}.png"
                         save_path = os.path.join(item_path, new_filename)
-                        augmented_img.save(save_path, "JPEG", quality=90) 
+                        augmented_img.save(save_path, "PNG", quality=90) 
                         
                         generated_count += 1
                         file_index += 1
