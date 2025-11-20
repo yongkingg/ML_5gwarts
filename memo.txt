@@ -1,0 +1,5 @@
+GIST : 512
+SIFT : 128
+HOG : 8100
+HSV : 512
+ORB : 32

@@ -21,6 +21,7 @@ warnings.filterwarnings('ignore')
 # ============================================================
 # 1. Feature Extraction Functions
 # ============================================================
+max_desc = 100
 
 def extract_hsv(img_bgr):
     img_hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
@@ -41,22 +42,43 @@ def extract_sift_avg(img_bgr):
     try:
         sift = cv2.SIFT_create()
         kp, des = sift.detectAndCompute(img_gray, None)
-        if des is not None and len(des) > 0:
-            return np.mean(des, axis=0)
-        return np.zeros(128)
+        
+        if des is None or len(des) == 0:
+            return np.zeros(max_desc * 128)
+
+        # 디스크립터 길이 조정 (padding 또는 trimming)
+        if des.shape[0] >= max_desc:
+            des = des[:max_desc]
+        else:
+            pad = np.zeros((max_desc - des.shape[0], 128))
+            des = np.vstack([des, pad])
+        
+        return des.flatten()
+
     except:
-        return np.zeros(128)
+        return np.zeros(max_desc * 128)
 
 def extract_orb_avg(img_bgr):
     img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
     try:
         orb = cv2.ORB_create(nfeatures=500)
         kp, des = orb.detectAndCompute(img_gray, None)
-        if des is not None and len(des) > 0:
-            return np.mean(des.astype(np.float32), axis=0)
-        return np.zeros(32)
+
+        if des is None or len(des) == 0:
+            return np.zeros(max_desc * 32)
+
+        des = des.astype(np.float32)
+
+        if des.shape[0] >= max_desc:
+            des = des[:max_desc]
+        else:
+            pad = np.zeros((max_desc - des.shape[0], 32), dtype=np.float32)
+            des = np.vstack([des, pad])
+
+        return des.flatten()
+
     except:
-        return np.zeros(32)
+        return np.zeros(max_desc * 32)
 
 def compute_gist_gray(img_bgr):
     IMG_SIZE = 256
@@ -227,8 +249,9 @@ def main():
         base_dir = os.path.dirname(current_script_path)
     except:
         base_dir = os.getcwd()
+    print(base_dir)
 
-    data_root_dir = os.path.join(base_dir, "data", "processed")
+    data_root_dir = os.path.join(base_dir,"../", "data", "processed")
     print(f"데이터 폴더: {data_root_dir}")
 
     if not os.path.exists(data_root_dir):
